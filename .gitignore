@@ -15,7 +15,7 @@ output/
 htmlcov/
 
 # Claude Code
-CLAUDE.md
+.claude/CLAUDE.md
 .claude/
 
 # OS files
@@ -25,4 +25,4 @@ Thumbs.db
 # Personal/local config
 *.local.yaml
 *.local.yml
-ai-pbom-requirements.md
+.claude/ai-pbom-requirements.md
