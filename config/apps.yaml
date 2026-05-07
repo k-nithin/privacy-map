@@ -1,0 +1,30 @@
+# AI PBOM Application Manifest
+# Define AI applications and their data dependencies.
+
+applications:
+  - app_id: customer-chatbot
+    app_type: chatbot
+    model_provider: openai
+    model_name: gpt-4
+    external_endpoint: https://api.openai.com/v1/chat/completions
+    declared_dependencies:
+      - pg:public.prompt_logs
+      - pg:public.customers
+      - pgvec:public.embeddings
+
+  - app_id: internal-copilot
+    app_type: copilot
+    model_provider: anthropic
+    model_name: claude-3-sonnet
+    external_endpoint: https://api.anthropic.com/v1/messages
+    declared_dependencies:
+      - pg:public.documents
+      - fs:./data/documents
+
+  - app_id: support-summarizer
+    app_type: summarizer
+    model_provider: local
+    model_name: llama-3-8b
+    declared_dependencies:
+      - pg:public.transcripts
+      - pg:public.messages

@@ -1,0 +1,1 @@
+"""Application-to-asset mapping."""

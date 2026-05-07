@@ -1,0 +1,18 @@
+# Local test application manifest
+
+applications:
+  - app_id: customer-chatbot
+    app_type: chatbot
+    model_provider: openai
+    model_name: gpt-4
+    external_endpoint: https://api.openai.com/v1/chat/completions
+    declared_dependencies:
+      - fs:./data/prompt_logs
+      - fs:./data/documents
+
+  - app_id: internal-assistant
+    app_type: copilot
+    model_provider: local
+    model_name: llama-3
+    declared_dependencies:
+      - fs:./data/documents

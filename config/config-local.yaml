@@ -1,0 +1,25 @@
+# Local-only config (filesystem only, no Postgres required)
+
+data_sources:
+  - type: filesystem
+    paths:
+      - ./data/prompt_logs
+      - ./data/documents
+    include_patterns:
+      - "*.json"
+      - "*.jsonl"
+      - "*.txt"
+      - "*.csv"
+      - "*.md"
+    exclude_patterns:
+      - "*.tmp"
+
+sampling:
+  max_rows_per_table: 100
+  max_files_per_directory: 50
+  max_text_chars: 10000
+
+detectors:
+  pii: true
+  secrets: true
+  sensitivity: true

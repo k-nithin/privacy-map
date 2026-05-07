@@ -1,0 +1,3 @@
+{"role": "user", "content": "My email is john.doe@example.com and my SSN is 123-45-6789. Can you help me with my account?"}
+{"role": "assistant", "content": "I can help you with your account. Let me look up your information."}
+{"role": "user", "content": "My customer_id is CUST-98765 and phone is (555) 234-5678"}

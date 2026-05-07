@@ -1,0 +1,28 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+.idea/
+*.iml
+output/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Claude Code
+CLAUDE.md
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Personal/local config
+*.local.yaml
+*.local.yml
+ai-pbom-requirements.md
