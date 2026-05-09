@@ -1,0 +1,27 @@
+# Demo application manifest
+
+applications:
+  - app_id: customer-support-bot
+    app_type: chatbot
+    model_provider: openai
+    model_name: gpt-4
+    external_endpoint: https://api.openai.com/v1/chat/completions
+    declared_dependencies:
+      - fs:./demo/sample_data/prompt_logs
+      - fs:./demo/sample_data/documents
+
+  - app_id: fine-tuning-pipeline
+    app_type: classifier
+    model_provider: openai
+    model_name: gpt-3.5-turbo-ft
+    external_endpoint: https://api.openai.com/v1/fine_tuning/jobs
+    declared_dependencies:
+      - fs:./demo/sample_data/training
+
+  - app_id: internal-knowledge-assistant
+    app_type: copilot
+    model_provider: local
+    model_name: llama-3-8b
+    declared_dependencies:
+      - fs:./demo/sample_data/documents
+      - fs:./demo/sample_data/prompt_logs

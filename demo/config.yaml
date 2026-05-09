@@ -1,0 +1,26 @@
+# Demo scan configuration — filesystem only, no database required
+
+data_sources:
+  - type: filesystem
+    paths:
+      - ./demo/sample_data/prompt_logs
+      - ./demo/sample_data/training
+      - ./demo/sample_data/documents
+    include_patterns:
+      - "*.jsonl"
+      - "*.json"
+      - "*.md"
+      - "*.txt"
+      - "*.csv"
+    exclude_patterns:
+      - "*.tmp"
+
+sampling:
+  max_rows_per_table: 100
+  max_files_per_directory: 50
+  max_text_chars: 10000
+
+detectors:
+  pii: true
+  secrets: true
+  sensitivity: true

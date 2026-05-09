@@ -1,0 +1,3 @@
+{"prompt": "Summarize the customer complaint", "completion": "Customer Jane Smith (jane.smith@example.com) reported billing errors on account ACCT-99182. She was charged $499 instead of $49. Phone: (555) 987-6543."}
+{"prompt": "Draft a response to the escalation", "completion": "Dear Ms. Smith, we sincerely apologize for the billing error on your account. A refund of $450 has been issued to your credit card ending in 4532."}
+{"prompt": "Classify the support ticket", "completion": "Category: billing_error. Severity: high. Customer satisfaction score: 2/10. Employee handling: rep_id EMP-2847."}

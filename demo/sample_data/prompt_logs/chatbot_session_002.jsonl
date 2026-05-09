@@ -1,0 +1,4 @@
+{"role": "user", "content": "I want to cancel my subscription. Customer_id: CUST-44201."}
+{"role": "assistant", "content": "I'm sorry to hear that. Let me pull up your account."}
+{"role": "user", "content": "My SSN is 234-56-7890 if you need it for identity check."}
+{"role": "assistant", "content": "We don't require SSN for cancellation. I've processed your request."}

@@ -1,0 +1,5 @@
+{"role": "user", "content": "Hi, I need help updating my billing address to 742 Evergreen Terrace, Springfield."}
+{"role": "assistant", "content": "I can help with that. Could you confirm your account email?"}
+{"role": "user", "content": "Sure, it's homer.simpson@example.com and my phone is (555) 012-3456."}
+{"role": "assistant", "content": "Thank you. I've updated your billing address on file."}
+{"role": "user", "content": "Also my date of birth is dob: 1965-05-12, in case you need it for verification."}
