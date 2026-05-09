@@ -151,9 +151,12 @@ def _sample_asset(config: dict, asset: Asset, sampling: dict) -> list[str]:
 
     try:
         connector = get_connector(source)
+        max_items = sampling["max_rows_per_table"]
+        if asset.store_type == "filesystem":
+            max_items = sampling["max_files_per_directory"]
         samples = connector.sample(
             asset,
-            max_rows=sampling["max_rows_per_table"],
+            max_rows=max_items,
             max_chars=sampling["max_text_chars"],
         )
         connector.close()

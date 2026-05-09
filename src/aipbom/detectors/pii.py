@@ -15,7 +15,7 @@ PATTERNS: list[tuple[str, re.Pattern, float]] = [
 ]
 
 
-def _mask(text: str, max_len: int = 20) -> str:
+def _mask(text: str) -> str:
     """Mask detected text for evidence without exposing raw PII."""
     if len(text) <= 4:
         return "***"
