@@ -41,6 +41,77 @@ A self-contained demo with sample data is included — no database or external s
 
 This scans synthetic prompt logs, training data, and documents, then outputs a full privacy risk report to `demo/output/report.md`.
 
+### Sample Output
+
+<details>
+<summary>Click to expand sample report output</summary>
+
+```
+# AI PBOM Report
+
+## Scan Summary
+
+- Assets discovered: 9
+- Applications mapped: 3
+- Relationships identified: 5
+- Findings generated: 17
+
+## Top Findings
+
+### [CRITICAL] secrets — fs:demo/sample_data/documents/api_integration_notes.md
+
+Secrets/credentials found in file: generic_api_key, slack_token, bearer_token, aws_access_key
+
+- Evidence: sample_size=1, match_count=4, match_rate=400.0%
+
+### [HIGH] pii — fs:demo/sample_data/prompt_logs
+
+PII detected in prompt_logs: email, phone, customer_id, ssn, date_of_birth
+
+- Evidence: sample_size=2, match_count=5, match_rate=250.0%
+
+### [MEDIUM] sensitivity — fs:demo/sample_data/training
+
+Sensitive domain content in training_data: customer_support, finance, hr
+
+- Evidence: sample_size=1, match_count=3, match_rate=300.0%
+
+## Top Risky Assets
+
+### fs:demo/sample_data/documents — Score: 70 (critical)
+
+- PII detected in content
+- Secrets/credentials detected
+- Sensitive domain content detected
+
+### fs:demo/sample_data/training — Score: 50 (high)
+
+- PII detected in content
+- Sensitive domain content detected
+- Asset is training data
+
+### fs:demo/sample_data/prompt_logs — Score: 45 (medium)
+
+- PII detected in content
+- Asset is a prompt log store
+
+## Top Risky Applications
+
+### customer-support-bot — Score: 20 (low)
+
+- Uses external endpoint: https://api.openai.com/v1/chat/completions
+
+## Remediation Recommendations
+
+1. Rotate exposed credentials and remove secrets from AI data stores immediately.
+2. Review and minimize PII in prompt logs, training data, and vector stores.
+3. Prioritize remediation of critical-risk assets.
+4. Audit data sent to external model endpoints for sensitive content leakage.
+5. Apply access controls to assets containing HR, finance, health, or legal data.
+```
+
+</details>
+
 ### Run Against Your Own Data
 
 ```bash
