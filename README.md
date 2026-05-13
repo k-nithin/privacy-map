@@ -202,6 +202,35 @@ applications:
 | PII | Email, phone, SSN, customer IDs, date of birth, addresses |
 | Secrets | API keys, bearer tokens, private keys, AWS/GitHub/Slack tokens |
 | Sensitivity | HR, finance, health, legal, and customer support content |
+| Custom | Company-specific patterns and keywords (user-configurable) |
+
+### Custom Detector
+
+The custom detector ships with built-in defaults for common employee data (employee ID, badge number, payroll ID) and loads additional patterns from `config/custom_detectors.yaml`.
+
+Edit the wrapper config to add your own:
+
+```yaml
+# config/custom_detectors.yaml
+
+# Add company-specific regex patterns
+patterns:
+  - label: emp_nbr
+    regex: "\\bW[-\\s]?\\d{6,}\\b"
+    confidence: 0.9
+
+# Add keyword groups
+keywords:
+  - label: internal_projects
+    terms: ["project alpha", "codename phoenix"]
+    confidence: 0.8
+
+# Disable any built-in defaults you don't need
+# disable_defaults:
+#   - badge_number
+```
+
+Built-in defaults run automatically. User patterns merge on top. No code changes needed.
 
 ## Risk Scoring
 
