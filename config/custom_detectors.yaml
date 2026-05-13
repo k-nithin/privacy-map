@@ -1,0 +1,35 @@
+# Custom Sensitive Data Detectors
+#
+# This file extends the built-in defaults. Edit it to add your
+# company-specific patterns and keywords.
+#
+# Built-in defaults (always active unless disabled):
+#   - employee_id       (EMP-1234, emp_5678)
+#   - badge_number      (badge-1234, BADGE 5678)
+#   - payroll_id        (payroll-1234, PAYROLL 5678)
+#   - employee_name_field (employee_name: John)
+#   - employee_data     (keyword group: hire date, w-2, severance, etc.)
+#
+# To disable a built-in default, add its label to disable_defaults:
+# disable_defaults:
+#   - badge_number
+
+# Add your own regex patterns:
+patterns:
+  - label: emp_nbr
+    regex: "\\bW[-\\s]?\\d{6,}\\b"
+    confidence: 0.9
+#  - label: policy_number
+#    regex: "\\bPOL[-\\s]?\\d{8,}\\b"
+#    confidence: 0.85
+#  - label: case_id
+#    regex: "\\bCASE[-\\s]?\\d{6,}\\b"
+#    confidence: 0.85
+
+# Add your own keyword groups:
+# keywords:
+#   - label: internal_projects
+#     terms:
+#       - "project alpha"
+#       - "codename phoenix"
+#     confidence: 0.8

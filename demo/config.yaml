@@ -24,3 +24,5 @@ detectors:
   pii: true
   secrets: true
   sensitivity: true
+  custom:
+    config_path: config/custom_detectors.yaml
