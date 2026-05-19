@@ -27,6 +27,18 @@ def test_detect_private_key():
     assert any(d.label == "private_key" for d in results)
 
 
+def test_detect_openai_key():
+    detector = SecretsDetector()
+    results = detector.detect("OPENAI_API_KEY=sk-abcdefghijklmnopqrstuvwxyz1234567890")
+    assert any(d.label == "openai_api_key" for d in results)
+
+
+def test_detect_anthropic_key():
+    detector = SecretsDetector()
+    results = detector.detect("key: sk-ant-api03-abcdefghijklmnopqrstuvwxyz")
+    assert any(d.label == "anthropic_api_key" for d in results)
+
+
 def test_no_secrets():
     detector = SecretsDetector()
     results = detector.detect("This is just a normal paragraph about cats.")

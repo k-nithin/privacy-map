@@ -13,6 +13,8 @@ TEXT_EXTENSIONS = {".txt", ".json", ".csv", ".md", ".jsonl", ".yaml", ".yml", ".
 ASSET_TYPE_HINTS = {
     "prompt": "prompt_logs",
     "chat": "prompt_logs",
+    "chat_history": "prompt_logs",
+    "conversation": "prompt_logs",
     "message": "prompt_logs",
     "training": "training_data",
     "train": "training_data",

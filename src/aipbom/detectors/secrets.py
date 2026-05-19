@@ -5,6 +5,8 @@ import re
 from aipbom.detectors.base import BaseDetector, Detection
 
 PATTERNS: list[tuple[str, re.Pattern, float]] = [
+    ("openai_api_key", re.compile(r"\bsk-[A-Za-z0-9]{20,}\b"), 0.95),
+    ("anthropic_api_key", re.compile(r"\bsk-ant-[A-Za-z0-9\-]{20,}\b"), 0.95),
     ("aws_access_key", re.compile(r"\b(?:AKIA)[A-Z0-9]{16}\b"), 0.95),
     ("aws_secret_key", re.compile(r"(?i)aws.{0,20}secret.{0,20}['\"][A-Za-z0-9/+=]{40}['\"]"), 0.9),
     ("generic_api_key", re.compile(r"(?i)(?:api[_-]?key|apikey)[:\s=]+['\"]?[A-Za-z0-9_\-]{20,}['\"]?"), 0.85),
