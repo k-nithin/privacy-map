@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "aipbom"
 version = "0.1.0"
 description = "AI Privacy Posture & Data Map - inventory and risk-map AI data assets"
+license = {file = "LICENSE"}
 requires-python = ">=3.11"
 dependencies = [
     "click>=8.1",
