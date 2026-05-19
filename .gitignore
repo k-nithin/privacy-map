@@ -9,8 +9,8 @@ build/
 venv/
 .idea/
 *.iml
-output/
-demo/output/
+/output/
+/demo/output/
 .pytest_cache/
 .coverage
 htmlcov/
