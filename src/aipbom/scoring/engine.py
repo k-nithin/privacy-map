@@ -21,6 +21,12 @@ APP_WEIGHTS = {
     "secrets_in_dependency": 25,
 }
 
+_DETECTION_CATEGORIES = [
+    ("pii", "pii_detected", "PII"),
+    ("secrets", "secrets_detected", "Secrets/credentials"),
+    ("sensitivity", "sensitivity_detected", "Sensitive domain content"),
+]
+
 
 def _level_from_score(score: int) -> str:
     if score >= 70:
@@ -32,42 +38,110 @@ def _level_from_score(score: int) -> str:
     return "low"
 
 
+def _parse_match_rate(rate_str: str) -> float:
+    """Parse '24.0%' → 0.24."""
+    try:
+        return float(str(rate_str).strip("%")) / 100
+    except (ValueError, AttributeError):
+        return 0.0
+
+
+def _density_factor(match_rate: float) -> float:
+    """Scale weight by how pervasive detections are within sampled content."""
+    if match_rate >= 0.10:
+        return 1.4
+    if match_rate >= 0.02:
+        return 1.0
+    return 0.6
+
+
+def _confidence_factor(confidence: float) -> float:
+    """Scale weight by detector confidence."""
+    if confidence >= 0.9:
+        return 1.2
+    if confidence >= 0.7:
+        return 1.0
+    return 0.8
+
+
+def _size_bonus(schema_info: dict) -> tuple[int, str]:
+    """Additive bonus for large data assets (more exposure surface)."""
+    size_bytes = schema_info.get("size_bytes") or 0
+    row_count = schema_info.get("row_count") or 0
+    if size_bytes >= 10_000_000 or row_count >= 10_000:
+        return 10, "Large data asset (>10 MB / >10k rows)"
+    if size_bytes >= 100_000 or row_count >= 100:
+        return 5, "Medium data asset (>100 KB / >100 rows)"
+    return 0, ""
+
+
+def _sampling_coverage_drivers(asset: Asset) -> list[str]:
+    """Warn when only a small fraction of a large asset was sampled."""
+    sample_size = asset.sample_size
+    if not sample_size:
+        return []
+    row_count = asset.schema_info.get("row_count") or 0
+    size_bytes = asset.schema_info.get("size_bytes") or 0
+    if row_count > 1000:
+        coverage = sample_size / row_count
+        if coverage < 0.01:
+            return [f"Warning: {coverage:.1%} of rows sampled — score may underestimate actual risk"]
+    elif size_bytes > 1_000_000 and sample_size < 10:
+        return ["Warning: large file partially sampled — score may underestimate actual risk"]
+    return []
+
+
 def score_asset(asset: Asset, findings: list[Finding]) -> RiskSummary:
     """Compute risk score for a single asset based on its findings."""
     score = 0
     drivers = []
 
     asset_findings = [f for f in findings if f.subject_id == asset.asset_id]
+    finding_by_category = {f.category: f for f in asset_findings}
 
-    categories_found = {f.category for f in asset_findings}
+    # Detection scoring — base weight scaled by match density and confidence
+    for category, weight_key, label in _DETECTION_CATEGORIES:
+        finding = finding_by_category.get(category)
+        if not finding:
+            continue
+        evidence = finding.evidence
+        if evidence:
+            match_rate = _parse_match_rate(evidence.get("match_rate", "0%"))
+            confidence = evidence.get("max_confidence", 0.8)
+            match_count = evidence.get("match_count", 1)
+            df = _density_factor(match_rate)
+            cf = _confidence_factor(confidence)
+            cat_score = round(ASSET_WEIGHTS[weight_key] * df * cf)
+            drivers.append(
+                f"{label} detected: {match_count} matches, "
+                f"{evidence.get('match_rate')} density, "
+                f"{confidence:.0%} confidence → +{cat_score}"
+            )
+        else:
+            # No evidence — neutral factors
+            cat_score = ASSET_WEIGHTS[weight_key]
+            drivers.append(f"{label} detected → +{cat_score}")
+        score += cat_score
 
-    if "pii" in categories_found:
-        score += ASSET_WEIGHTS["pii_detected"]
-        drivers.append("PII detected in content")
+    # Asset type structural bonuses (not scaled — inherent risk)
+    for asset_type, weight_key, desc in [
+        ("prompt_logs", "prompt_logs", "Asset is a prompt log store"),
+        ("vector_table", "vector_table", "Asset is a vector store"),
+        ("training_data", "training_data", "Asset is training data"),
+        ("transcripts", "transcripts", "Asset contains transcripts"),
+    ]:
+        if asset.asset_type == asset_type:
+            score += ASSET_WEIGHTS[weight_key]
+            drivers.append(desc)
 
-    if "secrets" in categories_found:
-        score += ASSET_WEIGHTS["secrets_detected"]
-        drivers.append("Secrets/credentials detected")
+    # Data size bonus
+    size_pts, size_desc = _size_bonus(asset.schema_info)
+    if size_pts:
+        score += size_pts
+        drivers.append(size_desc)
 
-    if "sensitivity" in categories_found:
-        score += ASSET_WEIGHTS["sensitivity_detected"]
-        drivers.append("Sensitive domain content detected")
-
-    if asset.asset_type == "prompt_logs":
-        score += ASSET_WEIGHTS["prompt_logs"]
-        drivers.append("Asset is a prompt log store")
-
-    if asset.asset_type == "vector_table":
-        score += ASSET_WEIGHTS["vector_table"]
-        drivers.append("Asset is a vector store")
-
-    if asset.asset_type == "training_data":
-        score += ASSET_WEIGHTS["training_data"]
-        drivers.append("Asset is training data")
-
-    if asset.asset_type == "transcripts":
-        score += ASSET_WEIGHTS["transcripts"]
-        drivers.append("Asset contains transcripts")
+    # Sampling coverage warnings (informational only — no score change)
+    drivers.extend(_sampling_coverage_drivers(asset))
 
     score = min(score, 100)
 

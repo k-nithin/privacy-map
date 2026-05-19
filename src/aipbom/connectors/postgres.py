@@ -15,6 +15,8 @@ ASSET_TYPE_HINTS = {
     "prompt_logs": "prompt_logs",
     "messages": "prompt_logs",
     "chat_log": "prompt_logs",
+    "chat_history": "prompt_logs",
+    "conversations": "prompt_logs",
     "training_data": "training_data",
     "train": "training_data",
     "embeddings": "vector_table",
@@ -59,13 +61,14 @@ class PostgresConnector(BaseConnector):
                 )
                 for (table_name,) in cur.fetchall():
                     columns = self._get_columns(cur, schema, table_name)
+                    row_count = self._get_row_count(cur, schema, table_name)
                     asset_id = f"pg:{schema}.{table_name}"
                     asset = Asset(
                         asset_id=asset_id,
                         asset_type=_infer_asset_type(table_name),
                         store_type="postgres",
                         location=f"{schema}.{table_name}",
-                        schema_info={"columns": columns},
+                        schema_info={"columns": columns, "row_count": row_count},
                     )
                     assets.append(asset)
                     logger.info("Discovered postgres asset: %s", asset_id)
@@ -93,6 +96,20 @@ class PostgresConnector(BaseConnector):
             (schema, table),
         )
         return {name: dtype for name, dtype in cur.fetchall()}
+
+    def _get_row_count(self, cur, schema: str, table: str) -> int:
+        """Approximate row count from pg_class statistics — no table scan."""
+        try:
+            cur.execute(
+                "SELECT reltuples::bigint FROM pg_class c "
+                "JOIN pg_namespace n ON n.oid = c.relnamespace "
+                "WHERE n.nspname = %s AND c.relname = %s",
+                (schema, table),
+            )
+            row = cur.fetchone()
+            return int(row[0]) if row and row[0] >= 0 else 0
+        except Exception:
+            return 0
 
     def close(self):
         if self.conn and not self.conn.closed:
